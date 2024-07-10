@@ -49,3 +49,17 @@ class BasicAuth(Auth):
             return None, None
         user_credentials = base64_decoded.split(':', 1)
         return user_credentials[0], user_credentials[1]
+
+    def user_object_from_credentials(self, user_email: str, user_pwd: str
+                                     ) -> Auth:
+        """ user_object_from_credentials
+        """
+        if user_email is None or user_pwd is None:
+            return None
+        try:
+            user = Auth()
+            user.email = user_email
+            user.password = user_pwd
+            return user
+        except Exception:
+            return None
