@@ -24,7 +24,7 @@ else:
 
 
 @app.before_request
-def before_request():
+def before_request() -> str:
     """ Before request
     """
     if auth is None:
