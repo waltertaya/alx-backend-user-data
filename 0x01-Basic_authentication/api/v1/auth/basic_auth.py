@@ -51,7 +51,11 @@ class BasicAuth(Auth):
         user_credentials = base64_decoded.split(':', 1)
         return user_credentials[0], user_credentials[1]
 
-    def user_object_from_credentials(self, user_email: str, user_pwd: str):
+    def user_object_from_credentials(
+            self,
+            user_email: str,
+            user_pwd: str
+            ) -> TypeVar('User'):
         """ user_object_from_credentials
         """
         if user_email is None or type(user_email) is not str:
