@@ -50,16 +50,18 @@ class BasicAuth(Auth):
         user_credentials = base64_decoded.split(':', 1)
         return user_credentials[0], user_credentials[1]
 
-    def user_object_from_credentials(self, user_email: str, user_pwd: str
-                                     ) -> Auth:
+    def user_object_from_credentials(self, user_email: str, user_pwd: str):
         """ user_object_from_credentials
         """
-        if user_email is None or user_pwd is None:
+        if user_email is None or type(user_email) is not str:
             return None
-        try:
-            user = Auth()
-            user.email = user_email
-            user.password = user_pwd
-            return user
-        except Exception:
+        if user_pwd is None or type(user_pwd) is not str:
             return None
+        from models.user import User
+        search_user = User.search({'email': user_email})
+        if search_user is None or search_user == []:
+            return None
+        for user in search_user:
+            if user.is_valid_password(user_pwd):
+                return user
+        return None
