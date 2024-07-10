@@ -4,6 +4,7 @@
 """
 
 from api.v1.auth.auth import Auth
+from typing import TypeVar
 
 
 class BasicAuth(Auth):
@@ -65,3 +66,25 @@ class BasicAuth(Auth):
             if user.is_valid_password(user_pwd):
                 return user
         return None
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """ current_user
+        """
+        if request is None:
+            return None
+        auth_header = self.authorization_header(request)
+        if auth_header is None:
+            return None
+        base64_header = self.extract_base64_authorization_header(auth_header)
+        if base64_header is None:
+            return None
+        b64 = base64_header
+        decoded_base64_header = self.decode_base64_authorization_header(b64)
+        if decoded_base64_header is None:
+            return None
+        user_credentials = self.extract_user_credentials(decoded_base64_header)
+        if user_credentials[0] is None or user_credentials[1] is None:
+            return None
+        user = self.user_object_from_credentials(user_credentials[0],
+                                                 user_credentials[1])
+        return user
