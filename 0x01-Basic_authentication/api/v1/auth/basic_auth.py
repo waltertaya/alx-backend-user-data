@@ -5,6 +5,7 @@
 
 from api.v1.auth.auth import Auth
 from typing import TypeVar
+from models.user import User
 
 
 class BasicAuth(Auth):
@@ -58,17 +59,27 @@ class BasicAuth(Auth):
             ) -> TypeVar('User'):
         """ user_object_from_credentials
         """
-        if user_email is None or type(user_email) is not str:
-            return None
-        if user_pwd is None or type(user_pwd) is not str:
-            return None
-        from models.user import User
-        search_user = User.search({'email': user_email})
-        if search_user is None or search_user == []:
-            return None
-        for user in search_user:
-            if user.is_valid_password(user_pwd):
-                return user
+        # if user_email is None or type(user_email) is not str:
+        #     return None
+        # if user_pwd is None or type(user_pwd) is not str:
+        #     return None
+        # from models.user import User
+        # search_user = User.search({'email': user_email})
+        # if search_user is None or search_user == []:
+        #     return None
+        # for user in search_user:
+        #     if user.is_valid_password(user_pwd):
+        #         return user
+        # return None
+        if type(user_email) == str and type(user_pwd) == str:
+            try:
+                users = User.search({'email': user_email})
+            except Exception:
+                return None
+            if len(users) <= 0:
+                return None
+            if users[0].is_valid_password(user_pwd):
+                return users[0]
         return None
 
     def current_user(self, request=None) -> TypeVar('User'):
