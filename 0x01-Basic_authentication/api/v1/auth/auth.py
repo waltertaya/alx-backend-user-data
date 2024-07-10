@@ -4,7 +4,7 @@
 
 from flask import request
 from typing import List, TypeVar
-from models.user import User
+import re
 
 
 class Auth:
@@ -21,17 +21,18 @@ class Auth:
         # if path in excluded_paths:
         #     return False
         # return True
-        if path is None or excluded_paths is None or excluded_paths == []:
-            return True
-        if path[-1] != '/':
-            path += '/'
-        for excluded_path in excluded_paths:
-            if excluded_path[-1] != '/':
-                excluded_path += '/'
-            if excluded_path[-1] == '*' and path.startswith(excluded_path[:-1]):
+        if path is not None and excluded_paths is not None:
+            for exclusion_path in map(lambda x: x.strip(), excluded_paths):
+                pattern = ''
+                if exclusion_path[-1] == '*':
+                    pattern = '{}.*'.format(exclusion_path[0:-1])
+                elif exclusion_path[-1] == '/':
+                    pattern = '{}/*'.format(exclusion_path[0:-1])
+                else:
+                    pattern = '{}/*'.format(exclusion_path)
+                if re.match(pattern, path):
                     return False
-            if path == excluded_path:
-                return False
+        return True
 
     def authorization_header(self, request=None) -> str:
         """ authorization_header
