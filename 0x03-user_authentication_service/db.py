@@ -31,23 +31,18 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: str):
+    def add_user(self, email: str, hashed_password: str) -> User:
         ''' Args:
                 email: str
                 hashed_password: str
             Return:
                 User object
         '''
-        new_user = User(email=email, hashed_password=hashed_password)
-        session = self._session
         try:
-            session.add(new_user)
-            session.commit()
-            session.refresh(new_user)
-        except Exception as e:
-            session.rollback()
-            raise e
-        finally:
-            session.close()
-            self.__session = None
+            new_user = User(email=email, hashed_password=hashed_password)
+            self._session.add(new_user)
+            self._session.commit()
+        except Exception:
+            self._session.rollback()
+            new_user = None
         return new_user
